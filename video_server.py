@@ -118,7 +118,7 @@ def socket_poll():
             print(speed, steer, mode)
             if mode < 2:
                 move(speed, steer)
-            if mode == 2:
+            if mode in {2, 3}:
                 target_id = steer
         except Exception as e:
             print(e)

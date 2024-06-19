@@ -77,15 +77,16 @@ def toggle_cruise():
     global mode, key_up
     key_up = False
     mode = 1*(mode != 1)
-
-def enable_coco(id):
-    global mode, steer
-    mode = 2
-    steer = id
     
-def disable_coco():
-    global mode
-    mode = 0
+def toggle_coco():
+    global mode, steer
+    mode = 2*(mode != 2)
+    steer = 0
+
+def toggle_pose():
+    global mode, steer
+    mode = 3*(mode != 3)
+    steer = 0
 
 def cv2_to_pygame(image):
     pygame_image = pygame.image.frombuffer(image.tobytes(), image.shape[:2][::-1], "BGR")
@@ -124,10 +125,12 @@ try:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_c:
                         toggle_cruise()
-                    elif 49 <= event.key <= 57:
-                        enable_coco(event.key - 48)
+                    elif 49 <= event.key <= 57 and mode in {2, 3}:
+                        steer = event.key-48
                     elif event.key == 48:
-                        disable_coco()
+                        toggle_coco()
+                    elif event.key == pygame.K_q:
+                        toggle_pose()
 
 except KeyboardInterrupt or pygame.error:
     client.close()
