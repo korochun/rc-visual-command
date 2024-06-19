@@ -38,14 +38,14 @@ def process_coco(frame):
     global mode, target_id
     if mode == 2:
         frame, dir = human_processor(frame, target_id)
-        frame = add_text(frame, f'Human detection is enabled', 20, -60)
-        frame = add_text(frame, f'Current id: {target_id}', 20, -40)
+        frame = add_text(frame, f'Human detection is enabled', 20, -70)
+        frame = add_text(frame, f'Current id: {target_id}', 20, -45)
         if dir is not None:
             frame = cv2.circle(frame, dir, 5, (0, 0, 255), 2)
             height = frame.shape[0] - dir[1]
             hl = frame.shape[1]//2
             angle = int(((hl - dir[0])/hl)*60)
-            speed, steer = 10 * (max(10, height)-10), angle
+            speed, steer = min(2 * (max(10, height)-10), 70), min(angle**1.3, 60)
             frame = add_text(frame, f'Speed: {speed} Steering: {steer}', 20, -20)
             move(speed, steer)
     return frame
@@ -124,7 +124,7 @@ def socket_poll():
             print(speed, steer, mode)
             if mode < 2:
                 move(speed, steer)
-            if mode in {2, 3}:
+            elif mode in {2, 3}:
                 target_id = steer
         except Exception as e:
             print(e)

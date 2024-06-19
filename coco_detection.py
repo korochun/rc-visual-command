@@ -7,8 +7,9 @@ from ultralytics.utils.plotting import Annotator
 model = YOLO('yolov8n.pt')
 model.classes = [0]
 
+
 def process_frame(frame, id):
-    results = model.track(frame, persist=True)[0]
+    results = model.track(frame, persist=True, classes = [0])[0]
     return results.plot(), calc_dir(results, id)
 
 def calc_dir(results, id):
