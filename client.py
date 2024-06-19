@@ -8,7 +8,7 @@ from video_processing import *
 
 client = requests.Session()
 host = '192.168.100.37'
-#host = 'localhost'
+host = 'localhost'
 
 resol_resp = client.get(f'http://{host}:5000/').json()
 resolution = resol_resp['resolution']
@@ -62,7 +62,6 @@ def keyboard_poll():
                 speed = min(speed + 10, 100)
             if d:
                 speed = max(speed - 10, -100)
-
         steer, speed = int(steer), int(speed)
         try:
             sock.send((f'{steer}|{speed}|{0}|7').encode('ascii'))
@@ -79,9 +78,16 @@ def toggle_cruise():
     key_up = False
     mode = 1*(mode != 1)
 
+def enable_coco(id):
+    global mode
+    mode = 2
+    steer = id
+    
+def disable_coco():
+    global mode
+    mode = 0
 
 def cv2_to_pygame(image):
-    #image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     pygame_image = pygame.image.frombuffer(image.tobytes(), image.shape[:2][::-1], "BGR")
     return pygame_image
 
@@ -89,8 +95,11 @@ def pipeline(frame):
     global steer, speed, mode
     frame =  cv2.resize(frame, (960, 720), interpolation = cv2.INTER_AREA)
     holder = gen_placeholder(frame, height=200)
-    holder = add_speed(holder, speed, steer)
+    sspd, sstr = (speed, steer) if mode < 2 else (-1, -1)
+    holder = add_speed(holder, sspd, sstr)
     holder = add_cruise(holder, mode == 1)
+    holder = add_coco(holder, mode == 2)
+
     frame = np.hstack((frame, holder))
     return frame
 
@@ -116,6 +125,10 @@ try:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_c:
                         toggle_cruise()
+                    elif 49 <= event.key <= 57:
+                        enable_coco(event.key - 48)
+                    elif event.key == 48:
+                        disable_coco()
 
 except KeyboardInterrupt or pygame.error:
     client.close()

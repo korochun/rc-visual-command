@@ -1,9 +1,11 @@
 from flask import Flask, render_template, Response, request, stream_with_context
 import cv2
-from detection import process_frame
+from pose_detection import process_frame as pose_processor
+from coco_detection import process_frame as human_processor
 from video_processing import add_text
 from threading import Thread
 import socket, serial, time
+from comm import Send
 
 app = Flask(__name__)
 #camera = VideoCamera()
@@ -23,13 +25,34 @@ sample = camera.read()[1]
 async def index():
     return {'resolution':sample.shape}
 
+mode, target_id = 0, 0
+
+def process_pose(frame):
+    global mode
+    if mode == 3:
+        frame = pose_processor(frame)
+    return frame
+
+def process_coco(frame):
+    global mode, target_id
+    if mode == 2:
+        frame, dir = human_processor(frame, target_id)
+        height = frame.shape[0] - dir[1]
+        hl = frame.shape[1]//2
+        angle = (hl - dir)//hl
+        move(50 * (max(10, height)-10), angle)
+    return frame
+    
+
+
 def pipeline(frame):
-    frame = process_frame(frame)
+    frame = process_pose(frame)
+    frame = process_coco(frame)
     return frame
 
 
 def gen():
-    global camera
+    global camera, mode
     cnt = 0
     while True:
         try:
@@ -63,8 +86,21 @@ sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sk.bind(('0.0.0.0', 2976))
 sk.listen(1) 
 
+import serial.tools.list_ports
+ports = list(serial.tools.list_ports.comports())
+if len(ports) == 0:
+    print('serial unavailable')
+    #exit(0)
+for p in ports:
+    try:
+        ser = serial.Serial(p.name, baudrate=115200)
+    except:
+        print(f'Serial {p.name} unavailable')
+
+
 def move(speed, steer):
-    ...
+    global ser
+    Send(uSpeed=speed, uSteer=steer, ser=ser)
 
 def socket_poll():
     print('Ожидание порта запущено')
@@ -73,10 +109,13 @@ def socket_poll():
     while True:
         try:
             data = conn.recv(1024)
-            speed, steer, mode, check = map(int, data.decode('ascii').split('|'))
+            speed, steer, mode, check, *data = map(int, data.decode('ascii').split('|'))
             if check != 7: continue
             print(speed, steer, mode)
-            move(speed, steer)
+            if mode < 2:
+                move(speed, steer)
+            if mode == 2:
+                target_id = steer
         except Exception as e:
             print(e)
             move(0, 0)
