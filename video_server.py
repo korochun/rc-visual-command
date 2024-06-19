@@ -37,10 +37,11 @@ def process_coco(frame):
     global mode, target_id
     if mode == 2:
         frame, dir = human_processor(frame, target_id)
-        height = frame.shape[0] - dir[1]
-        hl = frame.shape[1]//2
-        angle = (hl - dir[0])//hl
-        move(50 * (max(10, height)-10), angle)
+        if dir is not None:
+            height = frame.shape[0] - dir[1]
+            hl = frame.shape[1]//2
+            angle = (hl - dir[0])//hl
+            move(50 * (max(10, height)-10), angle)
     return frame
     
 
