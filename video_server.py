@@ -44,8 +44,8 @@ def process_coco(frame):
             frame = cv2.circle(frame, dir, 5, (0, 0, 255), 2)
             height = frame.shape[0] - dir[1]
             hl = frame.shape[1]//2
-            angle = int(((hl - dir[0])/hl)*60)
-            speed, steer = min(2 * (max(10, height)-10), 70), min(angle**1.3, 60)
+            angle = ((hl - dir[0])/hl)*60
+            speed, steer = int(min(2 * (max(10, height)-10), 70)), int(min(angle**1.3, 60))
             frame = add_text(frame, f'Speed: {speed} Steering: {steer}', 20, -20)
             move(speed, steer)
     return frame
@@ -119,7 +119,7 @@ def socket_poll():
     while True:
         try:
             data = conn.recv(1024)
-            steer, speed, mode, check = map(int, data.decode('ascii').split('|'))
+            steer, speed, mode, check, *shit = map(int, data.decode('ascii').split('|'))
             if check != 7: continue
             print(speed, steer, mode)
             if mode < 2:
