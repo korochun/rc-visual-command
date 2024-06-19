@@ -93,7 +93,8 @@ if len(ports) == 0:
     #exit(0)
 for p in ports:
     try:
-        ser = serial.Serial(p.name, baudrate=115200)
+        ser = serial.Serial(p.device, baudrate=115200)
+        print(f'Serial {p.name} opened')
     except:
         print(f'Serial {p.name} unavailable')
 

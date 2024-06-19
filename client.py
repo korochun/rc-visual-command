@@ -8,7 +8,7 @@ from video_processing import *
 
 client = requests.Session()
 host = '192.168.100.37'
-host = 'localhost'
+#host = 'localhost'
 
 resol_resp = client.get(f'http://{host}:5000/').json()
 resolution = resol_resp['resolution']
