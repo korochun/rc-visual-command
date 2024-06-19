@@ -6,19 +6,19 @@ from threading import Thread
 import socket, serial, time
 
 app = Flask(__name__)
-#cam = VideoCamera()
-cam = cv2.VideoCapture(0)
+#camera = VideoCamera()
+camera = cv2.VideoCapture(0)
 
 cnt = 0
-while not cam.read()[0]:
+while not camera.read()[0]:
     time.sleep(0.2)
     print('webcam err')
     cnt+=1
     if cnt %10 == 0: 
-        cam.release()
-        cam = cv2.VideoCapture(0)
+        camera.release()
+        camera = cv2.VideoCapture(0)
 
-sample = cam.read()[1]
+sample = camera.read()[1]
 @app.route('/')
 async def index():
     return {'resolution':sample.shape}
