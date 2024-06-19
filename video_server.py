@@ -65,8 +65,8 @@ def gen():
                 yield(frame.tobytes())
         except GeneratorExit:
             return
-        except:
-            print('camera error')
+        except Exception as e:
+            print(f'camera error: {e}')
             cnt += 1
             if cnt == 10:
                 camera.release()
