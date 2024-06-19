@@ -40,8 +40,8 @@ def process_coco(frame):
         if dir is not None:
             height = frame.shape[0] - dir[1]
             hl = frame.shape[1]//2
-            angle = (hl - dir[0])//hl
-            move(50 * (max(10, height)-10), angle)
+            angle = int(((hl - dir[0])/hl)*40)
+            move(10 * (max(10, height)-10), angle)
     return frame
     
 
