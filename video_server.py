@@ -46,7 +46,6 @@ def process_coco(frame):
             hl = frame.shape[1]//2
             angle = ((hl - dir[0])/hl)*60
             speed, steer = int(min(2 * (max(10, height)-10), 70)), int(min(angle**1.3, 60))
-            
         else:
             speed, steer = 0, 0
         frame = add_text(frame, f'Speed: {speed} Steering: {steer}', 20, -20)
