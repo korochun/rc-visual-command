@@ -3,7 +3,6 @@ import cv2, torch
 from ultralytics import YOLO
 from ultralytics.engine.results import Results
 from ultralytics.utils.plotting import Annotator
-from webcam import Webcam
 
 COLORS = {
     "left": (70, 230, 30),
@@ -93,19 +92,19 @@ def plot_stuff(annotator: Annotator, result: Results, pose):
 # load the pose detection model
 model = YOLO('yolov8n-pose.pt')
 
-# connect webcam
-webcam = Webcam(0)
-for frame in webcam:
-    # apply model and plot keypoints to image
+def process_frame(frame):
     result = model.track(frame)[0]
-
     pose = [*detect_poses(result)]
-
     plot_stuff(Annotator(frame), result, pose)
+    return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-    # Show the frames in a cv2 window
-    cv2.imshow('Webcam Frame', cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+if __name__ == '__main__':
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    while True:
+        res, frame = cap.read()
+        if res:
+            frame = process_frame(frame)
+            cv2.imshow('Result', frame)
+            cv2.waitKey(1)
 
-    # Break the loop if the user presses the 'q' key
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
