@@ -15,6 +15,10 @@ def add_speed(frame, speed, steer):
     frame = add_text(frame, f'Steer: {steer}', 20, 80)
     return frame
 
+def add_cruise(frame, flag):
+    frame = add_text(frame, f'Cruise: {"on" if flag else "off"}', 20, 120)
+    return frame
+
 def gen_placeholder(frame, height = None, width = None):
     #frame[-frame.shape[0]//8:, :200] //=3
     shape = [*frame.shape]
