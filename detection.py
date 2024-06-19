@@ -96,7 +96,7 @@ def process_frame(frame):
     result = model.track(frame)[0]
     pose = [*detect_poses(result)]
     plot_stuff(Annotator(frame), result, pose)
-    return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    return frame
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
