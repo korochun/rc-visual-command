@@ -105,6 +105,7 @@ def move(speed, steer):
     Send(uSpeed=speed, uSteer=steer, ser=ser)
 
 def socket_poll():
+    global mode, target_id
     print('Ожидание порта запущено')
     conn = sk.accept()[0]
     print('Есть подключение!')
