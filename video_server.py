@@ -40,6 +40,8 @@ def gen():
             if res:
                 frame = pipeline(frame) 
                 yield(frame.tobytes())
+        except GeneratorExit:
+            return
         except:
             print('camera error')
             cnt += 1

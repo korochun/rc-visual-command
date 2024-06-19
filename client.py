@@ -58,11 +58,14 @@ def pipeline(frame):
     frame = np.hstack((frame, holder))
     return frame
 
-
-resp = client.get(f'http://{host}:5000/video_feed', stream=True)
-for line in resp.iter_content(size):
-    if line:
-        frame = np.frombuffer(line, dtype=np.uint8).reshape(resolution)
-        frame = pipeline(frame)
-        cv2.imshow('stream', frame)
-        cv2.waitKey(1)
+try:
+    resp = client.get(f'http://{host}:5000/video_feed', stream=True)
+    for line in resp.iter_content(size):
+        if line:
+            frame = np.frombuffer(line, dtype=np.uint8).reshape(resolution)
+            frame = pipeline(frame)
+            cv2.imshow('stream', frame)
+            cv2.waitKey(1)
+except KeyboardInterrupt:
+    client.close()
+    
