@@ -7,7 +7,7 @@ import pygame
 from video_processing import *
 
 client = requests.Session()
-host = '192.168.100.37'
+host = '192.168.164.190'
 #host = 'localhost'
 
 resol_resp = client.get(f'http://{host}:5000/').json()
@@ -37,18 +37,18 @@ def keyboard_poll():
     while True:
         l, r, u, d = (keyboard.is_pressed(b) for b in ('left', 'right', 'up', 'down'))
         if not key_up: key_up = not(u or d)
+
         if mode == 0:
             if l:
-                steer = max(steer - (abs(steer) + 1)**0.6, -50)
+                steer = max(steer - (steer+50)/2, -50)
             if r:
-                steer = min(steer + (abs(steer) + 1)**0.6, 50)
-
+                steer = min(steer + (50-steer)/2, 50)
             if u:
                 speed = min(speed + (abs(speed) + 1)**0.4, 100)
             if d:
                 speed = max(speed - (abs(speed) + 1)**0.4, -100)
             if not (l or r):
-                steer *= 0.7
+                steer *= 0.2
             if not (u or d):
                 speed *= 0.7
         elif mode == 1 and key_up:

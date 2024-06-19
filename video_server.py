@@ -134,7 +134,6 @@ def socket_poll():
             move(0, 0)
             conn = sk.accept()[0]
             print('Есть подключение!')
-        time.sleep(0.05)
 
 
 
