@@ -14,6 +14,7 @@ resolution = resol_resp['resolution']
 print(resolution)
 size = resolution[0] * resolution[1] * resolution[2]
 
+accK = 10
 
 speed, steer = 0, 0
 
@@ -31,22 +32,28 @@ def keyboard_poll():
                 print('Error opening socket')
     connect()
     while True:
-        steer, speed = 0, 0
-        if keyboard.is_pressed("left"):
-            steer -= 50
-        if keyboard.is_pressed("right"):
-            steer += 50
-        if keyboard.is_pressed("up"):
-            speed += 50
-        elif keyboard.is_pressed("down"):
-            speed -= 50
+        l, r, u, d = (keyboard.is_pressed(b) for b in ('left', 'right', 'up', 'down'))
+        if l:
+            steer = max(steer - (abs(steer) + 1)**0.6, -50)
+        if r:
+            steer = min(steer + (abs(steer) + 1)**0.6, 50)
+        if not (l or r):
+            steer *= 0.7
+        if u:
+            speed = min(speed + (abs(speed) + 1)**0.4, 100)
+        if d:
+            speed = max(speed - (abs(speed) + 1)**0.4, -100)
+        if not (u or d):
+            speed *= 0.7
+
+        steer, speed = int(steer), int(speed)
         try:
-            sock.send((f'{steer}|{speed}').encode('ascii'))
+            sock.send((f'{steer}|{speed}|{0}|7').encode('ascii'))
         except Exception as e:
             print(e)
             connect() 
 
-        time.sleep(0.1)
+        time.sleep(0.15)
 
 threading.Thread(target=keyboard_poll).start()
 

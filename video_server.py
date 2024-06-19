@@ -73,8 +73,9 @@ def socket_poll():
     while True:
         try:
             data = conn.recv(1024)
-            speed, steer = map(int, data.decode('ascii').split('|'))
-            print(speed, steer)
+            speed, steer, mode, check = map(int, data.decode('ascii').split('|'))
+            if check != 7: continue
+            print(speed, steer, mode)
             move(speed, steer)
         except Exception as e:
             print(e)
