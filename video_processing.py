@@ -34,7 +34,6 @@ if __name__ == '__main__':
     frame = cap.read()[1]
     frame = cv2.resize(frame, (1600, 900), interpolation = cv2.INTER_AREA)
     cap.release()
-    frame = add_placeholder(frame)
 #    add_speed(image, 100, 10)
     cv2.imshow('frame', frame)
     cv2.waitKey(0)

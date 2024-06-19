@@ -6,6 +6,7 @@ from video_processing import add_text
 from threading import Thread
 import socket, serial, time
 from comm import Send
+from video_processing import add_text
 
 app = Flask(__name__)
 #camera = VideoCamera()
@@ -37,11 +38,16 @@ def process_coco(frame):
     global mode, target_id
     if mode == 2:
         frame, dir = human_processor(frame, target_id)
+        frame = add_text(frame, f'Human detection is enabled', 20, -60)
+        frame = add_text(frame, f'Current id: {target_id}', 20, -40)
         if dir is not None:
+            frame = cv2.circle(frame, dir, 5, (0, 0, 255), 2)
             height = frame.shape[0] - dir[1]
             hl = frame.shape[1]//2
-            angle = int(((hl - dir[0])/hl)*40)
-            move(10 * (max(10, height)-10), angle)
+            angle = int(((hl - dir[0])/hl)*60)
+            speed, steer = 10 * (max(10, height)-10), angle
+            frame = add_text(frame, f'Speed: {speed} Steering: {steer}', 20, -20)
+            move(speed, steer)
     return frame
     
 
