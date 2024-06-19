@@ -1,6 +1,7 @@
 from flask import Flask, render_template, Response, request, stream_with_context
 import cv2
 from detection import process_frame
+from video_processing import add_text
 from threading import Thread
 import socket, serial, time
 
@@ -22,7 +23,14 @@ sample = cam.read()[1]
 async def index():
     return {'resolution':sample.shape}
 
-def gen(camera):
+def pipeline(frame):
+    frame = process_frame(frame)
+    return frame
+
+
+def gen():
+    global camera
+    cnt = 0
     while True:
         try:
             #frame = camera.get_frame()
@@ -30,14 +38,20 @@ def gen(camera):
             #    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
             res, frame = camera.read()
             if res:
-                frame = process_frame(frame) 
+                frame = pipeline(frame) 
                 yield(frame.tobytes())
         except:
-            ...
+            print('camera error')
+            cnt += 1
+            if cnt == 10:
+                camera.release()
+                camera = cv2.VideoCapture(0)
+                cnt = 0
+
 
 @app.route('/video_feed')
 async def video_feed():
-    return Response(gen(cam))
+    return Response(gen())
 
 
 sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
