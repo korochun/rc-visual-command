@@ -51,7 +51,10 @@ def gen():
 
 @app.route('/video_feed')
 async def video_feed():
-    return Response(gen())
+    try:
+        return Response(gen())
+    except:
+        pass
 
 
 sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
