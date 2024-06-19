@@ -39,7 +39,7 @@ def process_coco(frame):
         frame, dir = human_processor(frame, target_id)
         height = frame.shape[0] - dir[1]
         hl = frame.shape[1]//2
-        angle = (hl - dir)//hl
+        angle = (hl - dir[0])//hl
         move(50 * (max(10, height)-10), angle)
     return frame
     
