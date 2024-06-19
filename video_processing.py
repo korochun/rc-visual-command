@@ -1,8 +1,4 @@
 import cv2, numpy as np
-from PIL import Image, ImageFont, ImageDraw
-
-monospace = ImageFont.truetype("Nunito.ttf",32)
-
 
 def add_text(frame, text, x, y, size = 1, color = (255, 255, 255), thick = 1):
     if x < 0: x += frame.shape[1]

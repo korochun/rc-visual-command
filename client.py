@@ -99,7 +99,6 @@ def pipeline(frame):
     holder = add_speed(holder, sspd, sstr)
     holder = add_cruise(holder, mode == 1)
     holder = add_coco(holder, mode == 2)
-
     frame = np.hstack((frame, holder))
     return frame
 

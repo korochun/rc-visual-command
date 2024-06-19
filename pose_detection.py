@@ -90,7 +90,7 @@ def plot_stuff(annotator: Annotator, result: Results, pose):
 
 
 # load the pose detection model
-model = YOLO('yolov8n-pose.pt', verbose=False)
+model = YOLO('yolov8n-pose.pt')
 
 def process_frame(frame):
     result = model.track(frame)[0]
