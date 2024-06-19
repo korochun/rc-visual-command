@@ -121,8 +121,12 @@ def socket_poll():
     print('Есть подключение!')
     while True:
         try:
-            data = conn.recv(1024)
-            steer, speed, mode, check, *shit = map(int, data.decode('ascii').split('|'))
+            data = b''
+            while not b'!' in data:
+                data += conn.recv(1024)
+            s = data.decode('ascii')
+            s = s[:s.find('!')]
+            steer, speed, mode, check, *shit = map(int, s.split('|'))
             if check != 7: continue
             print(speed, steer, mode)
             if mode < 2:

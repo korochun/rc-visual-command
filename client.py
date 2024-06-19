@@ -64,7 +64,7 @@ def keyboard_poll():
                 speed = max(speed - 10, -100)
         steer, speed = int(steer), int(speed)
         try:
-            sock.send((f'{steer}|{speed}|{mode}|7').encode('ascii'))
+            sock.send((f'{steer}|{speed}|{mode}|7!').encode('ascii'))
         except Exception as e:
             print(e)
             connect() 
