@@ -64,7 +64,7 @@ def keyboard_poll():
                 speed = max(speed - 10, -100)
         steer, speed = int(steer), int(speed)
         try:
-            sock.send((f'{steer}|{speed}|{0}|7').encode('ascii'))
+            sock.send((f'{steer}|{speed}|{mode}|7').encode('ascii'))
         except Exception as e:
             print(e)
             connect() 
@@ -79,7 +79,7 @@ def toggle_cruise():
     mode = 1*(mode != 1)
 
 def enable_coco(id):
-    global mode
+    global mode, steer
     mode = 2
     steer = id
     
