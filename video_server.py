@@ -101,6 +101,7 @@ for p in ports:
 
 def move(speed, steer):
     global ser
+    print(f'to device: {speed} {steer}')
     Send(uSpeed=speed, uSteer=steer, ser=ser)
 
 def socket_poll():
@@ -110,7 +111,7 @@ def socket_poll():
     while True:
         try:
             data = conn.recv(1024)
-            speed, steer, mode, check, *data = map(int, data.decode('ascii').split('|'))
+            steer, speed, mode, check = map(int, data.decode('ascii').split('|'))
             if check != 7: continue
             print(speed, steer, mode)
             if mode < 2:
