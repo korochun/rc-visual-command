@@ -7,8 +7,8 @@ import pygame
 from video_processing import *
 
 client = requests.Session()
-host = '192.168.191.215'
-host = 'localhost'
+host = '25.19.83.159'
+#host = 'localhost'
 
 resol_resp = client.get(f'http://{host}:5000/').json()
 resolution = resol_resp['resolution']
@@ -40,28 +40,28 @@ def keyboard_poll():
 
         if mode == 0:
             if l:
-                steer = max(steer - (steer+50)/3, -50)
+                steer = max(steer - (steer+50)/3, -80)
             if r:
-                steer = min(steer + (50-steer)/3, 50)
+                steer = min(steer + (50-steer)/3, 80)
             if u:
-                speed = min(speed + (abs(speed) + 1)**0.4, 100)
+                speed = min(speed + (abs(speed) + 10)**0.4, 200)
             if d:
-                speed = max(speed - (abs(speed) + 1)**0.4, -100)
+                speed = max(speed - (abs(speed) + 10)**0.4, -200)
             if not (l or r):
                 steer *= 0.2
             if not (u or d):
                 speed *= 0.7
         elif mode == 1 and key_up:
             if l:
-                steer = max(steer - 5, -50)
+                steer = max(steer - 5, -80)
             if r:
-                steer = min(steer + 5, 50)
+                steer = min(steer + 5, 80)
             if not (l or r):
                 steer = 0
             if u:
-                speed = min(speed + 10, 100)
+                speed = min(speed + 10, 150)
             if d:
-                speed = max(speed - 10, -100)
+                speed = max(speed - 10, -150)
         steer, speed = int(steer), int(speed)
         try:
             sock.send((f'{steer}|{speed}|{mode}|7!').encode('ascii'))
@@ -73,10 +73,12 @@ def keyboard_poll():
 
 threading.Thread(target=keyboard_poll).start()
 
+
 def toggle_cruise():
     global mode, key_up
     key_up = False
     mode = 1*(mode != 1)
+
     
 def toggle_coco():
     global mode, steer
@@ -95,11 +97,12 @@ def cv2_to_pygame(image):
 def pipeline(frame):
     global steer, speed, mode
     frame =  cv2.resize(frame, (960, 720), interpolation = cv2.INTER_AREA)
-    holder = gen_placeholder(frame, height=200)
+    holder = gen_placeholder(frame, height=250)
     sspd, sstr = (speed, steer) if mode < 2 else (-1, -1)
     holder = add_speed(holder, sspd, sstr)
     holder = add_cruise(holder, mode == 1)
     holder = add_coco(holder, mode == 2)
+    holder = add_pose(holder, mode == 3)
     frame = np.hstack((frame, holder))
     return frame
 
