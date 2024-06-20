@@ -1,5 +1,5 @@
 from flask import Flask, render_template, Response, request, stream_with_context
-import cv2
+import cv2, numpy as np
 from pose_detection import process_frame as pose_processor
 from coco_detection import process_frame as human_processor
 from video_processing import add_text
@@ -10,7 +10,13 @@ from video_processing import add_text
 
 app = Flask(__name__)
 #camera = VideoCamera()
-camera = cv2.VideoCapture(0)
+
+def get_cam():
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW) # this is the magic!
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    return cap
+camera = get_cam()
 
 cnt = 0
 while not camera.read()[0]:
@@ -19,7 +25,7 @@ while not camera.read()[0]:
     cnt+=1
     if cnt %10 == 0: 
         camera.release()
-        camera = cv2.VideoCapture(0)
+        camera = get_cam()
 
 sample = camera.read()[1]
 @app.route('/')
@@ -72,7 +78,8 @@ def gen():
             res, frame = camera.read()
             if res:
                 frame = pipeline(frame) 
-                yield(frame.tobytes())
+                enc = cv2.imencode('.jpeg', frame)[1]
+                yield(enc.tobytes())
         except GeneratorExit:
             return
         except Exception as e:

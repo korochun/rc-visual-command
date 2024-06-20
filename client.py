@@ -7,8 +7,8 @@ import pygame
 from video_processing import *
 
 client = requests.Session()
-host = '192.168.164.190'
-#host = 'localhost'
+host = '192.168.191.215'
+host = 'localhost'
 
 resol_resp = client.get(f'http://{host}:5000/').json()
 resolution = resol_resp['resolution']
@@ -40,9 +40,9 @@ def keyboard_poll():
 
         if mode == 0:
             if l:
-                steer = max(steer - (steer+50)/2, -50)
+                steer = max(steer - (steer+50)/3, -50)
             if r:
-                steer = min(steer + (50-steer)/2, 50)
+                steer = min(steer + (50-steer)/3, 50)
             if u:
                 speed = min(speed + (abs(speed) + 1)**0.4, 100)
             if d:
@@ -110,7 +110,8 @@ try:
     resp = client.get(f'http://{host}:5000/video_feed', stream=True)
     for line in resp.iter_content(size):
         if line:
-            frame = np.frombuffer(line, dtype=np.uint8).reshape(resolution)
+            frame = np.frombuffer(line, dtype=np.uint8)
+            frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
             frame = pipeline(frame)
 
             if screen is None:
